@@ -48,7 +48,7 @@ def build_input(output_list):
     for idx in range(len(var_list)):
         if (var_list[idx].type == str):
             float_vals = processed_values[idx : var_list[idx].size + idx]
-            input_list.append(''.join([runtime.conv_from_float(i, str) for i in float_vals]))
+            input_list.append(float_vals)
             arr_idx += var_list[idx].size
         else:
             input_list.append(runtime.conv_from_float(processed_values[arr_idx], var_list[idx].type))

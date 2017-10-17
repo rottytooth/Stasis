@@ -60,7 +60,7 @@ class VariableStore(object):
     def set(name, value, typ):
         if (typ == None): 
             typ = type(value)
-        if type(value) == str: # or array?
+        if typ == str and isinstance(value, list): # might be an array of floats or a string
             new_var = String(len(value))
             new_var.value = value
         else:
@@ -147,4 +147,7 @@ class String(Variable):
 
     @value.setter
     def value(self, value):
-        self._value[:] = [conv_to_float(x) for x in value]    
+        if type(value) == str:
+            self._value[:] = [conv_to_float(x) for x in value]    
+        else: # float
+            self._value = value

@@ -45,3 +45,6 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+/__pycache__
+/.vs/Stasis/v15
+/.vs/Stasis/v15/.suo
