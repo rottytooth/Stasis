@@ -43,8 +43,9 @@ def build_input(output_list):
             raw_values.append(float(obj))
 
     processed_values = build_input_array_floats(raw_values)
+    input_list.append(processed_values.pop(0)) # pop the leading zero
 
-    arr_idx = 0
+    arr_idx = 0 
     for idx in range(len(var_list)):
         if (var_list[idx].type == str):
             float_vals = processed_values[idx : var_list[idx].size + idx]
@@ -56,4 +57,3 @@ def build_input(output_list):
 
     return input_list
 
-       

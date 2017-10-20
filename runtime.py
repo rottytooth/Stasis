@@ -48,27 +48,32 @@ def get_var(name):
 def set_var(name, value, typ = None):
     VariableStore.set(name, value, typ)
 
+def reset_store():
+    VariableStore.reset()
+
 
 class VariableStore(object):
     __vars = {} #: :type: dict of (str, Variable)
 
     @staticmethod
     def reset():
-        _vars = {}
+        VariableStore.__vars = {}
 
     @staticmethod
     def set(name, value, typ):
         if (typ == None): 
             typ = type(value)
         if typ == str and isinstance(value, list): # might be an array of floats or a string
-            new_var = String(len(value))
-            new_var.value = value
+            new_var = String()
+            VariableStore.__vars[name] = new_var
+            for x in value: # for strings, we have to update_all after each char is added
+                VariableStore.__vars[name].append(x)
+                VariableStore._update_all()
         else:
             new_var = Variable(typ)
             new_var.value = value
-
-        VariableStore.__vars[name] = new_var
-        VariableStore._update_all()
+            VariableStore.__vars[name] = new_var
+            VariableStore._update_all()
 
     @staticmethod
     def get(name):
@@ -134,8 +139,8 @@ class Variable(object):
 
 class String(Variable):
 
-    def __init__(self, length):
-        Variable.__init__(self, str, [0] * length) # should be an array of float
+    def __init__(self):
+        Variable.__init__(self, str, []) # should be an array of float
 
     @property
     def length(self):
@@ -151,3 +156,6 @@ class String(Variable):
             self._value[:] = [conv_to_float(x) for x in value]    
         else: # float
             self._value = value
+
+    def append(self, float):
+        self._value.append(float)
