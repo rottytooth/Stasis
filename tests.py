@@ -1,14 +1,14 @@
 import sys
 import unittest
-import interpreter
 import runtime
+import varloader
 
 class Test_tests(unittest.TestCase):
 
     def test_hello_floats(self):
         runtime.reset_store()
 
-        input = interpreter.build_input_array_floats([72, 101, 108, 111])
+        input = varloader.build_input_array_floats([72, 101, 108, 111])
         #print(input)
 
         # holder cell
@@ -28,7 +28,7 @@ class Test_tests(unittest.TestCase):
     def test_hello_from_string(self):
         runtime.reset_store()
 
-        input_set = interpreter.build_input(["Hello, World!"])
+        input_set = varloader.build_input(["Hello, World!"])
         runtime.set_var("esc", 0)
         runtime.set_var("h", input_set[1], str)
         self.assertEqual(runtime.get_var("h"), "Hello, World!")
