@@ -1,5 +1,3 @@
-# Stasis runtime module
-
 import math
 
 class InterpreterError(Exception):
@@ -22,6 +20,7 @@ def conv_to_float(item):
     }
     return options_in[type(item)](item) 
 
+
 def conv_from_float(item_value, item_type):
     def to_int(a):
         return int(round(a))
@@ -41,121 +40,114 @@ def conv_from_float(item_value, item_type):
     }
     return options_out[item_type](item_value) 
 
-def get_var(name):
-    return VariableStore.get(name)
-
-
-def set_var(name, value, typ = None):
-    VariableStore.set(name, value, typ)
 
 def reset_store():
-    VariableStore.reset()
-
-
-class VariableStore(object):
-    __vars = {} #: :type: dict of (str, Variable)
-
-    @staticmethod
-    def reset():
-        VariableStore.__vars = {}
-
-    @staticmethod
-    def set(name, value, typ):
-        if (typ == None): 
-            typ = type(value)
-        if typ == str and isinstance(value, list): # might be an array of floats or a string
-            new_var = String()
-            VariableStore.__vars[name] = new_var
-            for x in value: # for strings, we have to update_all after each char is added
-                VariableStore.__vars[name].append(x)
-                VariableStore._update_all()
-        else:
-            new_var = Variable(typ)
-            new_var.value = value
-            VariableStore.__vars[name] = new_var
-            VariableStore._update_all()
-
-    @staticmethod
-    def get(name):
-        if type(VariableStore.__vars[name]) is String:
-            retset = []
-            retset[:] = [conv_from_float(x, str) for x in VariableStore.__vars[name]._value]
-            return ''.join(retset)
-        else:
-            return VariableStore.__vars[name].value
-
-    def _total_length():
-        length = 0.0
-
-        for key, value in VariableStore.__vars.items():
-            if type(value) is String:
-                length += value.length
-            else:
-                length += 1.0
-        return length
-
-# delete_var?
-
-    @staticmethod
-    def _update_all():
-        numerator = 0
-
-        if (len(VariableStore.__vars) > 0):
-            for key, var in VariableStore.__vars.items():
-                if type(var) == String:
-                    for char in var.value:
-                        numerator += float(ord(char))
-                else:
-                    numerator += var._value
-
-            offset = numerator / VariableStore._total_length()
-            for key, var in VariableStore.__vars.items():
-                if type(var) == String:
-                    var._value[:] = [x - offset for x in var._value]
-                else:
-                    VariableStore.__vars[key]._value -= offset    
+    Variable._store = {}
 
 
 class Variable(object):
 
-    def __init__(self, type, value = 0.0):
+    # !!!use as static only!!!
+    _store = {} # this is our variable store for all values
+
+    def _update_all():
+        numerator = 0
+        denom = 0
+
+        if (len(Variable._store) > 0):
+            for key, var in Variable._store.items():
+                if isinstance(var, list): # each list is a list of floats
+                    numerator += sum(var)
+                    denom += len(var)
+                else:
+                    numerator += var
+                    denom  += 1
+
+            offset = numerator / denom
+            for key, var in Variable._store.items():
+                if isinstance(var, list):
+                    Variable._store[key] = [x - offset for x in var]
+                else:
+                    Variable._store[key] -= offset    
+
+    def __init__(self, name, type, value):
+        self.name = name
         self.type = type
-        self._value = value
-        
+        Variable._store[name] = conv_to_float(value)
+        Variable._update_all()
+
     @property
     def value(self): # getter
-        return conv_from_float(self._value, self.type)
+        return conv_from_float(Variable._store[self.name], self.type)
 
     @value.setter
     def value(self, value):
-        self._value = conv_to_float(value)
+        self.type = type(value)
+        Variable._store[self.name] = conv_to_float(value)
+        Variable._update_all()
 
     @value.deleter
     def value(self):
-        print("deleter of value called")
-#VariableStore.Delete(xxx...)
-        del self._value
-    
+        del Variable._store[self.name]
+        Variable._update_all()
 
+    def __lt__(self, other):
+        return self.value < other
+
+    def ___le__(self, other):
+        return self.value <= other
+
+    def __eq__(self, other):
+        return self.value == other
+
+    def __ne__(self, other):
+        return self.value != other
+
+    def __gt__(self, other):
+        return self.value > other
+
+    def __ge__(self, other):
+        return self.value >= other
+
+    def __str__(self):
+        return str(self.value)
+
+    
 class String(Variable):
 
-    def __init__(self):
-        Variable.__init__(self, str, []) # should be an array of float
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
 
     @property
     def length(self):
         return len(self.value)
 
     @property
-    def value(self): # getter
-        return ''.join([conv_from_float(i, str) for i in self._value])
+    def value(self): # return as array of floats
+        return Variable._store[self.name]
+
+    @property
+    def string(self): # this is for actual display
+        retstring = ''
+        for a in Variable._store[self.name]:
+            a = int(round(a))
+            if 0 < a < 0x110000:
+                retstring += chr(a)
+        return retstring
 
     @value.setter
     def value(self, value):
-        if type(value) == str:
-            self._value[:] = [conv_to_float(x) for x in value]    
+        Variable._store[self.name] = []
+        if type(value) == str or isinstance(value, list):
+            for x in [conv_to_float(x) for x in value]: # for strings, we have to update_all after each char is added
+                Variable._store[self.name].append(x)
+                Variable._update_all()
         else: # float
-            self._value = value
+            self._value = [value]
+
+    def __str__(self):
+        return ''.join([conv_from_float(i, str) for i in self._value])
 
     def append(self, float):
         self._value.append(float)

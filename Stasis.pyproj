@@ -21,11 +21,19 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="99bottles.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="runtime.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="varloader.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="runtime.py" />
     <Compile Include="tests.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="__init__.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
