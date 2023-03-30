@@ -22,4 +22,4 @@ The program above is attempting to print the value of a, but a was never assigne
 
 This is a partial implementation for the language, making Stasis-aware variables available in C#. A full implementation would allow only these variables. 
 
-Stasis 2.0 fixes a major issue with the language itself. Previously, arrays and strings were added at the same time, so that one character in a string would not affect another, but rather the entire string would shift collectively. In the new 
+Stasis 2.0 fixes a major issue with the language itself. Previously, arrays and strings were added at the same time, so that one character in a string would not affect another, but rather the entire string would shift collectively. In the new version, each element is added one-by-one, kicking off the recalculation of the rest of the data.
