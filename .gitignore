@@ -49,3 +49,7 @@ Temporary Items
 /.vs/Stasis/v15
 /.vs/Stasis/v15/.suo
 /interpreter.py
+
+bin/
+bin/*
+obj/
