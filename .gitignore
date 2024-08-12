@@ -53,3 +53,6 @@ Temporary Items
 bin/
 bin/*
 obj/
+.vs/*
+.vs
+ValueBuilder.cs

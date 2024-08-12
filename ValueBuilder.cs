@@ -3,7 +3,7 @@ namespace Rottytooth.Esolangs.Stasis
 {
     public static class ValueBuilder
     {
-        public static double[] Build(params double[] targets, HashCodeHolder)
+        public static double[] Build(params double[] targets)
         {
             // assumes a holder var to start things off -- TODO: make that a param
 
